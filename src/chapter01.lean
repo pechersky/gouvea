@@ -1,43 +1,23 @@
 import field_theory.ratfunc
+import data.complex.basic
 
 -- ring of integers ℤ
 example : comm_ring ℤ := by apply_instance
 
 -- field of fractions ℚ
-noncomputable example : ℚ ≃+* fraction_ring ℤ := (fraction_ring.alg_equiv ℤ ℚ).symm.to_ring_equiv
+noncomputable example : ℚ ≃ₐ[ℤ] fraction_ring ℤ := (fraction_ring.alg_equiv ℤ ℚ).symm
 
-attribute [simps] fraction_ring.alg_equiv
+-- ring of polynomials over the complexes
+noncomputable example : comm_ring (polynomial ℂ) := by apply_instance
 
-example : (fraction_ring.alg_equiv ℤ ℚ : fraction_ring ℤ → ℚ) =
-  λ q, localization.lift_on q (λ n d, (n / d : ℚ))
-    begin
-      rintro a c ⟨b, hb⟩ ⟨d, hd⟩,
-      rw localization.r_iff_exists,
-      rintro ⟨⟨k, hk⟩, h⟩,
-      rw mem_non_zero_divisors_iff_ne_zero at hb hd hk,
-      simp only [set_like.coe_mk, coe_coe],
-      rw div_eq_div_iff,
-      { simpa [←int.cast_mul, hk] using h },
-      { simpa only [int.cast_eq_zero, ne.def, coe_coe] using hb },
-      { simpa only [int.cast_eq_zero, ne.def, coe_coe] using hd },
-    end :=
-begin
-  ext x,
-  induction x with n d a b c d h,
-  { rw [fraction_ring.alg_equiv_apply, localization.lift_on_mk, localization.mk_eq_mk',
-      is_localization.map_mk'],
-    simp },
-  { simp }
-end
+-- field of fractions ℂ(X)
+noncomputable example : ratfunc ℂ ≃ₐ[ℂ] fraction_ring (polynomial ℂ) :=
+(fraction_ring.alg_equiv (polynomial ℂ) (ratfunc ℂ)).symm.restrict_scalars ℂ
 
--- the equivalence between the two fields is what we expect
-example : ((fraction_ring.alg_equiv ℤ ℚ).symm : ℚ → fraction_ring ℤ) =
-  λ q, localization.mk q.num
-    ⟨q.denom, mem_non_zero_divisors_iff_ne_zero.mpr (by simpa using q.pos.ne')⟩ :=
-begin
-  ext x,
-  apply (fraction_ring.alg_equiv ℤ ℚ).injective,
-  rw [alg_equiv.apply_symm_apply, fraction_ring.alg_equiv_apply, localization.mk_eq_mk',
-      is_localization.map_mk'],
-  simp
-end
+-- An element of f(X) : ℂ(X) is a “rational function,” i.e., a quotient
+-- of two polynomials, P(X), Q(X) : ℂ[X], Q(X) ≠ 0;
+-- we can always require that Q(X) is monic, i.e., its leading coefficient is 1.
+example (f : ratfunc ℂ) : ∃ (p q : polynomial ℂ) (hq : q ≠ 0) (hm : q.monic),
+  f = ratfunc.mk p q :=
+⟨f.num, f.denom, f.denom_ne_zero, f.monic_denom,
+  by simp only [ratfunc.mk_eq_div, ratfunc.num_div_denom]⟩
