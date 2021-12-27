@@ -21,3 +21,9 @@ example (f : ratfunc ℂ) : ∃ (p q : polynomial ℂ) (hq : q ≠ 0) (hm : q.mo
   f = ratfunc.mk p q :=
 ⟨f.num, f.denom, f.denom_ne_zero, f.monic_denom,
   by simp only [ratfunc.mk_eq_div, ratfunc.num_div_denom]⟩
+
+-- Any rational number x : ℚ is a quotient of two integers
+-- with a, b : ℤ, b ≠ 0, we can always require b > 0
+example (x : ℚ) : ∃ (a b : ℤ) (hb : 0 < b),
+  x = a / b :=
+⟨x.num, x.denom, int.coe_nat_pos.mpr x.pos, x.num_div_denom.symm⟩
