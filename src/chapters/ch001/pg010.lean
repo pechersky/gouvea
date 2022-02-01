@@ -75,8 +75,8 @@ end
 example (p : polynomial ℂ) (α : ℂ) : ∃ (q : polynomial ℂ) (hq : q.nat_degree = p.nat_degree),
   p = q.sum (λ i a, a • (X - C α) ^ i) :=
 begin
-  use taylor α p,
-  { sorry },
+  refine ⟨taylor α p, nat_degree_taylor _ _, _⟩,
+  simp_rw [smul_eq_C_mul, sum_taylor_eq]
 end
 
 example : 321 = nat.of_digits 10 [1, 2, 3] :=
