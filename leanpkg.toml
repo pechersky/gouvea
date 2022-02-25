@@ -1,8 +1,8 @@
 [package]
 name = "gouvea"
 version = "0.1"
-lean_version = "leanprover-community/lean:3.39.1"
+lean_version = "leanprover-community/lean:3.40.0"
 path = "src"
 
 [dependencies]
-mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "4a5728fe0d7987c5bf39204b7e82d8f2e12e6ece"}
+mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "605ea9f3477150b698cb98a2878f04e98af31ba8"}

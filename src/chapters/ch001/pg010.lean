@@ -44,6 +44,10 @@ begin
   simpa using congr_arg (eval 0) H
 end
 
+-- Need this to express that a polynomial is an algebraic function
+local attribute [instance] polynomial.has_scalar_pi polynomial.has_scalar_pi'
+  polynomial.algebra_pi
+
 -- f(X) = √(X ^ 3 − 3 X + 1),
 -- which is a root of Y ^ 2 − (X ^ 3 − 3 X + 1), is an algebraic function
 example : is_algebraic (polynomial ℤ) (λ x, complex.cpow (x ^ 3 - 3 • x + 1) (1 / 2)) :=
@@ -51,23 +55,29 @@ begin
   refine ⟨X ^ 2 - C (X ^ 3 - 3 • X + 1), _, _⟩,
   { intro H,
     replace H := congr_arg (eval 0) (congr_arg (eval 0) H),
-    simpa using H },
+    simpa only [nsmul_eq_mul, eval_sub, eval_pow, eval_X, eval_add, eval_C,
+                eval_mul, eval_one, mul_zero, eval_zero] using H },
   { ext1 x,
     suffices : ((x ^ 3 - 3 * x + 1) ^ (2 : ℂ)⁻¹) ^ 2 - (x ^ 3 - 3 * x + 1) = 0,
-    { simpa },
+    { simpa only [nsmul_eq_mul, one_div, complex.cpow_eq_pow, _root_.map_add,
+      _root_.map_sub, nat.cast_bit1, map_pow, _root_.map_mul, _root_.map_one, aeval_one,
+      pi.sub_apply, nat.cast_one, aeval_X, pi.pow_apply, aeval_C, C_bit1, aeval_bit1,
+      pi.add_apply, algebra_map_pi_eq_aeval, pi.one_apply] },
     have h2 : (2 : ℂ) = (2 : ℝ),
-    { simp },
+    { simp only [complex.of_real_bit0, complex.of_real_one] },
     rw [←complex.cpow_nat_cast, ←complex.cpow_mul],
-    { simp },
+    { simp only [nat.cast_bit0, nat.cast_one, inv_mul_cancel_of_invertible,
+                 complex.cpow_one, sub_self] },
     { rw [h2, ←complex.of_real_inv, mul_comm, ←complex.real_smul,
-          complex.smul_im, smul_eq_mul, ←inv_mul_lt_iff, inv_inv₀],
+          complex.smul_im, smul_eq_mul, ←inv_mul_lt_iff, inv_inv],
       { refine lt_trans _ (complex.neg_pi_lt_log_im _),
-        simpa [two_mul] using real.pi_pos },
-      { simp } },
+        simpa only [two_mul, add_neg_lt_iff_le_add', add_right_neg,
+                    right.neg_neg_iff] using real.pi_pos},
+      { simp only [inv_pos, zero_lt_bit0, zero_lt_one] } },
     { rw [h2, ←complex.of_real_inv, mul_comm, ←complex.real_smul,
           complex.smul_im, smul_eq_mul, inv_mul_le_iff],
       { refine (complex.log_im_le_pi (x ^ 3 - 3 * x + 1)).trans _,
-        simpa [two_mul] using real.pi_pos.le },
+        simpa only [two_mul, le_add_iff_nonneg_left] using real.pi_pos.le },
       { exact zero_lt_two } } }
 end
 
