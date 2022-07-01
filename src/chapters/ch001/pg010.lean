@@ -45,7 +45,7 @@ begin
 end
 
 -- Need this to express that a polynomial is an algebraic function
-local attribute [instance] polynomial.has_scalar_pi polynomial.has_scalar_pi'
+local attribute [instance] polynomial.has_smul_pi polynomial.has_smul_pi'
   polynomial.algebra_pi
 
 -- f(X) = √(X ^ 3 − 3 X + 1),
